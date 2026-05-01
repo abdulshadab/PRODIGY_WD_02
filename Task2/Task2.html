@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stopwatch with Laps</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #244980;
+        }
+        .stopwatch-container {
+            text-align: center;
+            background: #fff;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 320px;
+        }
+        .display {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            font-family: 'Courier New', Courier, monospace;
+            color: #333;
+            font-weight: bold;
+        }
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .controls button {
+            padding: 12px;
+            font-size: 1rem;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+        .controls button:active { opacity: 0.7; }
+        
+        .start { background: #28a745; color: white; }
+        .pause { background: #ffc107; color: white; display: none; }
+        .reset { background: #dc3545; color: white; }
+        .lap { background: #17a2b8; color: white; }
+        
+        .laps-list {
+            margin-top: 1.5rem;
+            max-height: 200px;
+            overflow-y: auto;
+            text-align: left;
+            padding-left: 0;
+            list-style: none;
+            border-top: 1px solid #eee;
+        }
+        .laps-list li {
+            padding: 10px 5px;
+            border-bottom: 1px solid #eee;
+            font-size: 0.95rem;
+            color: #555;
+            display: flex;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+
+<div class="stopwatch-container">
+    <div class="display" id="display">00:00:00</div>
+    <div class="controls">
+        <button class="start" id="startBtn">Start</button>
+        <button class="pause" id="pauseBtn">Pause</button>
+        <button class="lap" id="lapBtn">Lap</button>
+        <button class="reset" id="resetBtn">Reset</button>
+    </div>
+    <ul class="laps-list" id="lapsList"></ul>
+</div>
+
+<script>
+    let startTime;
+    let elapsedTime = 0;
+    let timerInterval;
+
+    const display = document.getElementById('display');
+    const startBtn = document.getElementById('startBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const lapBtn = document.getElementById('lapBtn');
+    const lapsList = document.getElementById('lapsList');
+
+    function timeToString(time) {
+        let diffInHrs = time / 3600000;
+        let hh = Math.floor(diffInHrs);
+
+        let diffInMin = (diffInHrs - hh) * 60;
+        let mm = Math.floor(diffInMin);
+
+        let diffInSec = (diffInMin - mm) * 60;
+        let ss = Math.floor(diffInSec);
+
+        let diffInMs = (diffInSec - ss) * 100;
+        let ms = Math.floor(diffInMs);
+
+        let formattedMM = mm.toString().padStart(2, "0");
+        let formattedSS = ss.toString().padStart(2, "0");
+        let formattedMS = ms.toString().padStart(2, "0");
+
+        return `${formattedMM}:${formattedSS}:${formattedMS}`;
+    }
+
+    function start() {
+        startTime = Date.now() - elapsedTime;
+        timerInterval = setInterval(() => {
+            elapsedTime = Date.now() - startTime;
+            display.innerHTML = timeToString(elapsedTime);
+        }, 10);
+        toggleButtons(true);
+    }
+
+    function pause() {
+        clearInterval(timerInterval);
+        toggleButtons(false);
+    }
+
+    function reset() {
+        clearInterval(timerInterval);
+        display.innerHTML = "00:00:00";
+        elapsedTime = 0;
+        lapsList.innerHTML = "";
+        toggleButtons(false);
+    }
+
+    function lap() {
+        if (elapsedTime > 0) {
+            let li = document.createElement("li");
+            li.innerHTML = `<span>Lap ${lapsList.children.length + 1}</span> <span>${timeToString(elapsedTime)}</span>`;
+            lapsList.prepend(li);
+        }
+    }
+
+    function toggleButtons(isRunning) {
+        if (isRunning) {
+            startBtn.style.display = "none";
+            pauseBtn.style.display = "inline-block";
+        } else {
+            startBtn.style.display = "inline-block";
+            pauseBtn.style.display = "none";
+        }
+    }
+
+    startBtn.addEventListener("click", start);
+    pauseBtn.addEventListener("click", pause);
+    resetBtn.addEventListener("click", reset);
+    lapBtn.addEventListener("click", lap);
+</script>
+
+</body>
+</html>
