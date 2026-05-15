@@ -1,4 +1,4 @@
-# PRODIGY_WD_01
+# PRODIGY_WD_02
 # ⏱️ Stopwatch Web Application
 
 ## 📖 Overview
